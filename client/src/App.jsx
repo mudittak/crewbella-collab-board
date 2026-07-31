@@ -298,10 +298,8 @@ import PostForm from "./components/PostForm";
 import PostCard from "./components/PostCard";
 import "./App.css";
 
-// Use env variable if set (local dev), otherwise fall back to relative path (production - same domain)
-const BASE_URL = import.meta.env.VITE_API_URL || "";
-const API_URL = `${BASE_URL}/api/posts`;
-const socket = io(BASE_URL || undefined);
+const API_URL = "/api/posts";
+const socket = io();
 
 function App() {
   const [posts, setPosts] = useState([]);

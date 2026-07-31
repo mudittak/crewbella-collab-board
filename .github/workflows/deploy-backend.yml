@@ -1,3 +1,4 @@
+
 # name: Deploy Backend to Azure
 
 # on:
@@ -19,22 +20,18 @@
 #       contents: read
 
 #     steps:
-#       # 1. Get code from GitHub
 #       - name: Checkout code
 #         uses: actions/checkout@v4
 
-#       # 2. Setup Node.js
 #       - name: Setup Node.js
 #         uses: actions/setup-node@v4
 #         with:
 #           node-version: "22.x"
 
-#       # 3. Install backend dependencies
 #       - name: Install dependencies
 #         working-directory: server
 #         run: npm ci
 
-#       # 4. Login to Azure
 #       - name: Login to Azure
 #         uses: azure/login@v2
 #         with:
@@ -42,20 +39,20 @@
 #           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
 #           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-#       # 5. Deploy backend to Azure
 #       - name: Deploy Backend to Azure
 #         uses: azure/webapps-deploy@v3
 #         with:
 #           app-name: "crewbella-api-mudit"
 #           slot-name: "Production"
 #           package: ./server
-name: Deploy Backend to Azure
+name: Deploy Full Stack App to Azure
 
 on:
   push:
     branches:
       - main
     paths:
+      - "client/**"
       - "server/**"
       - ".github/workflows/deploy-backend.yml"
 
@@ -70,18 +67,39 @@ jobs:
       contents: read
 
     steps:
+      # 1. Checkout repository
       - name: Checkout code
         uses: actions/checkout@v4
 
+      # 2. Setup Node.js
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: "22.x"
 
-      - name: Install dependencies
+      # 3. Install frontend dependencies
+      - name: Install frontend dependencies
+        working-directory: client
+        run: npm ci
+
+      # 4. Build React frontend
+      - name: Build frontend
+        working-directory: client
+        run: npm run build
+
+      # 5. Copy frontend build into backend
+      - name: Copy frontend build
+        run: |
+          rm -rf server/client
+          mkdir -p server/client
+          cp -r client/dist server/client/dist
+
+      # 6. Install backend dependencies
+      - name: Install backend dependencies
         working-directory: server
         run: npm ci
 
+      # 7. Login to Azure
       - name: Login to Azure
         uses: azure/login@v2
         with:
@@ -89,7 +107,8 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-      - name: Deploy Backend to Azure
+      # 8. Deploy complete application
+      - name: Deploy Full Stack App to Azure
         uses: azure/webapps-deploy@v3
         with:
           app-name: "crewbella-api-mudit"

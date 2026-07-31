@@ -4,6 +4,7 @@
 // const dotenv = require("dotenv");
 // const mongoose = require("mongoose");
 // const http = require("http");
+// const path = require("path");
 // const { Server } = require("socket.io");
 
 // const postRoutes = require("./routes/postRoutes");
@@ -23,7 +24,8 @@
 // const allowedOrigins = [
 //   "http://localhost:5173",
 //   "http://localhost:5174",
-// ];
+//   process.env.FRONTEND_URL,
+// ].filter(Boolean);
 
 // app.use(
 //   cors({
@@ -52,9 +54,7 @@
 // mongoose
 //   .connect(process.env.MONGO_URI)
 //   .then(() => {
-//     console.log(
-//       "MongoDB connected successfully!"
-//     );
+//     console.log("MongoDB connected successfully!");
 //   })
 //   .catch((error) => {
 //     console.error(
@@ -64,80 +64,80 @@
 //   });
 
 // // ==========================================
-// // ROUTES
+// // API ROUTES
 // // ==========================================
 
-// app.use(
-//   "/api/posts",
-//   postRoutes
-// );
+// app.use("/api/posts", postRoutes);
 
 // // ==========================================
 // // HEALTH CHECK
 // // ==========================================
 
-// app.get(
-//   "/api/health",
-//   (req, res) => {
-//     res.json({
-//       success: true,
-//       message:
-//         "CollabBoard API is running successfully!",
-//     });
-//   }
-// );
+// app.get("/api/health", (req, res) => {
+//   res.json({
+//     success: true,
+//     message: "CollabBoard API is running successfully!",
+//   });
+// });
 
 // // ==========================================
 // // SOCKET.IO CONNECTION
 // // ==========================================
 
-// io.on(
-//   "connection",
-//   (socket) => {
+// io.on("connection", (socket) => {
+//   console.log("🟢 User connected:", socket.id);
+
+//   console.log(
+//     "👥 Total connected users:",
+//     io.engine.clientsCount
+//   );
+
+//   socket.on("disconnect", (reason) => {
 //     console.log(
-//       "🟢 User connected:",
-//       socket.id
+//       "🔴 User disconnected:",
+//       socket.id,
+//       "Reason:",
+//       reason
 //     );
 
 //     console.log(
 //       "👥 Total connected users:",
 //       io.engine.clientsCount
 //     );
-
-//     socket.on(
-//       "disconnect",
-//       (reason) => {
-//         console.log(
-//           "🔴 User disconnected:",
-//           socket.id,
-//           "Reason:",
-//           reason
-//         );
-
-//         console.log(
-//           "👥 Total connected users:",
-//           io.engine.clientsCount
-//         );
-//       }
-//     );
-//   }
-// );
+//   });
+// });
 
 // // Make Socket.IO available to routes
 // setSocketIO(io);
 
 // // ==========================================
+// // SERVE REACT FRONTEND
+// // ==========================================
+
+// const frontendPath = path.join(
+//   __dirname,
+//   "../../client/dist"
+// );
+
+// app.use(express.static(frontendPath));
+
+// app.get("*", (req, res) => {
+//   res.sendFile(
+//     path.join(frontendPath, "index.html")
+//   );
+// });
+
+// // ==========================================
 // // START SERVER
 // // ==========================================
 
-// server.listen(
-//   PORT,
-//   () => {
-//     console.log(
-//       `Server running on http://localhost:${PORT}`
-//     );
-//   }
-// );
+// server.listen(PORT, () => {
+//   console.log(
+//     `Server running on port ${PORT}`
+//   );
+// });
+
+
 const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
@@ -260,7 +260,7 @@ const frontendPath = path.join(
 
 app.use(express.static(frontendPath));
 
-app.get("*", (req, res) => {
+app.get("/*splat", (req, res) => {
   res.sendFile(
     path.join(frontendPath, "index.html")
   );

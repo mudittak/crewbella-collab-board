@@ -80,7 +80,7 @@ jobs:
       # 3. Install frontend dependencies
       - name: Install frontend dependencies
         working-directory: client
-        run: npm ci
+        run: npm install
 
       # 4. Build React frontend
       - name: Build frontend
@@ -97,7 +97,7 @@ jobs:
       # 6. Install backend dependencies
       - name: Install backend dependencies
         working-directory: server
-        run: npm ci
+        run: npm install
 
       # 7. Login to Azure
       - name: Login to Azure

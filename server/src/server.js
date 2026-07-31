@@ -255,7 +255,7 @@ setSocketIO(io);
 
 const frontendPath = path.join(
   __dirname,
-  "../../client/dist"
+  "../client/dist"
 );
 
 app.use(express.static(frontendPath));
